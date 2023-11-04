@@ -2,38 +2,40 @@ import Header from './Header';
 import MarkdownList from './MarkdownList';
 import MarkdownEditor from './MarkdownEditor';
 import { listMarkdowns, createMarkdown, updateMarkdown, deleteMarkdown } from '../Services/MarkdownService';
-import { useCallback, useEffect, useState } from 'react';
+import {useEffect, useState,useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 
 export default function Root() {
     const [markdownList, setMarkdownList] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
   
-    const onItemSelected = (data) => {
+    const onItemSelected = useCallback((data) => {
         data.selected = true;
         setSelectedItem(data);
-
-        if(markdownList && markdownList.length) {
-            const updatedData = [...markdownList].map(item => {                
-                item.selected =  item._id === data._id;
+    
+        if (markdownList && markdownList.length) {
+            const updatedData = [...markdownList].map(item => {
+                item.selected = item._id === data._id;
                 return item;
             });
             setMarkdownList(updatedData);
         }
-    };
+    }, [markdownList, setMarkdownList]);
+    
 
     const onAddNew = () => {
         setSelectedItem({ content: ''});
     };
 
-    const getAllMarkdowns = () => {
-        listMarkdowns((data) => {            
-            setMarkdownList(data); 
-            if(data && data.length) {
+    const getAllMarkdowns = useCallback(() => {
+        listMarkdowns((data) => {
+            setMarkdownList(data);
+            if (data && data.length) {
                 onItemSelected(data[0]);
             }
         });
-    };
+    }, [onItemSelected]);
+
     const onSave = () => {
         if(selectedItem._id) {
            
